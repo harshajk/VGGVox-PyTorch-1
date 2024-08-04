@@ -71,7 +71,7 @@ def accuracy(output, target, topk=(1,)):
 
         res = []
         for k in topk:
-            correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
+            correct_k = correct[:k].reshape(-1).float().sum(0, keepdim=True)
             res.append((correct_k.mul(100.0 / batch_size)).item())
         return res
 
@@ -160,13 +160,17 @@ if __name__=="__main__":
         loop=tqdm(Dataloaders['train'])
         loop.set_description(f'Epoch [{epoch+1}/{N_EPOCHS}]')
         for counter, (audio, labels) in enumerate(loop, start=1):
+            # print(f"audio shape: {audio.shape}, dtype: {audio.dtype}, device: {audio.device}")
+            # print(f"Labels shape: {labels.shape}, dtype: {labels.dtype}, device: {labels.device}")
+
             optimizer.zero_grad()
             audio = audio.to(device)
-            labels = labels.to(device)
+            labels = labels.to(device).long()
             if counter==32:
                 random_subset=audio
             outputs = model(audio)
             loss = loss_func(outputs, labels)
+            # print(f"Outputs shape: {outputs.shape}, dtype: {outputs.dtype}, device: {outputs.device}")
             running_loss+=loss
             corr1, corr5=accuracy(outputs, labels, topk=(1,5))
             top1+=corr1
