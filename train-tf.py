@@ -11,12 +11,12 @@ import time
 from tqdm.auto import tqdm
 import signal_utils as sig
 from scipy.io import wavfile
-from vggm import VGGM
+from vggmtf import VGGM
 import argparse
 
 LR = 0.01
-B_SIZE = 100
-N_EPOCHS = 150
+B_SIZE = 10
+N_EPOCHS = 1
 N_CLASSES = 1251
 LOCAL_DATA_DIR = "data/"
 MODEL_DIR = "models/"
@@ -56,7 +56,7 @@ def accuracy(y_true, y_pred, topk=(1, 5)):
     """Computes the accuracy over the k top predictions for the specified values of k"""
     maxk = max(topk)
     batch_size = tf.shape(y_true)[0]
-    
+    print('tf -> batch_size:', batch_size)
     _, top_k_indices = tf.math.top_k(y_pred, k=maxk)
     correct = tf.equal(tf.expand_dims(y_true, -1), tf.cast(top_k_indices, y_true.dtype))
     

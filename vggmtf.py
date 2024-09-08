@@ -27,8 +27,8 @@ class VGGM(models.Model):
         ])
         
         self.classifier = models.Sequential([
-            layers.Dense(1024, activation='relu'),
-            layers.Dense(n_classes)
+            layers.Dense(1024, activation='relu', name = 'fc7'),
+            layers.Dense(n_classes, name = 'fc8')
         ])
     
     def call(self, inputs):
