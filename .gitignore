@@ -4,3 +4,5 @@ __pycache__/
 data/
 models/
 .venv/
+.pt_venv/
+.tf_venv/

@@ -7,7 +7,8 @@ class VGGM(models.Model):
         super(VGGM, self).__init__()
         self.n_classes = n_classes
         self.features = models.Sequential([
-            layers.Conv2D(96, (7, 7), strides=(2, 2), padding='same', activation='relu', input_shape=(512, 300, 1)),
+            layers.Input(shape=(512, 300, 1)),
+            layers.Conv2D(96, (7, 7), strides=(2, 2), padding='same', activation='relu'),
             layers.BatchNormalization(momentum=0.5),
             layers.MaxPooling2D((3, 3), strides=(2, 2)),
             layers.Conv2D(256, (5, 5), strides=(2, 2), padding='same', activation='relu'),
