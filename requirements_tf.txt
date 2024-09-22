@@ -1,10 +1,8 @@
 numpy
 scipy
 pandas
-torch
-torchvision
+tensorflow
 matplotlib
 tqdm
 argparse
 torchsummary
-tensorflow[and-cuda]

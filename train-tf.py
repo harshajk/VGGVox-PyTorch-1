@@ -4,18 +4,19 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers, models, optimizers
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras import optimizers
+# from tensorflow.keras import layers, models
+# from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 import time
 from tqdm.auto import tqdm
 import signal_utils as sig
 from scipy.io import wavfile
-from vggmtf import VGGM
+from vggm_tf import VGGM
 import argparse
 
 LR = 0.01
-B_SIZE = 10
+B_SIZE = 100
 N_EPOCHS = 1
 N_CLASSES = 1251
 LOCAL_DATA_DIR = "data/"
