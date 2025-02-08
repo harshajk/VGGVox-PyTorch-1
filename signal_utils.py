@@ -14,6 +14,15 @@ from scipy.io import wavfile
 
 
 def rm_dc_n_dither(audio):
+    """
+    Remove DC offset and apply dithering to the audio signal.
+    This function removes the DC offset from the input audio signal using a high-pass filter
+    and then applies dithering by adding a small amount of noise to the signal.
+    Args:
+        audio (numpy.ndarray): Input audio signal as a numpy array.
+    Returns:
+        numpy.ndarray: Audio signal with DC offset removed and dithering applied.
+    """
     # All files 16kHz tested..... Will copy for 8kHz from author's matlab code later
     alpha=0.99
     b=[1,-1]
@@ -26,14 +35,49 @@ def rm_dc_n_dither(audio):
     return audio+(1e-6*spow)*dither
 
 def preemphasis(audio, alpha=0.97):
+    """
+    Apply a pre-emphasis filter to the input audio signal.
+
+    Parameters:
+    audio (array-like): The input audio signal to be filtered.
+    alpha (float, optional): The pre-emphasis coefficient. Default is 0.97.
+
+    Returns:
+    array-like: The filtered audio signal.
+    """
     b=[1, -alpha]
     a=1
     return lfilter(b, a, audio)
 
-def normalize_frames(m,epsilon=1e-12):
+def normalize_frames(m, epsilon=1e-12):
+    """
+    Normalize the frames of a given matrix.
+
+    This function normalizes each frame (row) of the input matrix `m` by subtracting the mean
+    and dividing by the standard deviation. The standard deviation is clipped to a minimum value of `epsilon` to avoid division by zero.
+
+    Parameters:
+    m (numpy.ndarray): The input matrix where each row represents a frame to be normalized.
+    epsilon (float, optional): A small value to avoid division by zero. Default is 1e-12.
+
+    Returns:
+    numpy.ndarray: The normalized matrix with the same shape as the input.
+    """
     return (m-m.mean(1, keepdims=True))/np.clip(m.std(1, keepdims=True),epsilon, None)
 
 def preprocess(audio, buckets=None, sr=16000, Ws=25, Ss=10, alpha=0.97):
+    """
+    Preprocesses the given audio signal to generate a spectrogram.
+    Parameters:
+    audio (numpy.ndarray): The input audio signal.
+    buckets (dict, optional): A dictionary mapping frame sizes to bucket sizes. Default is None.
+    sr (int, optional): The sample rate of the audio signal. Default is 16000.
+    Ws (int, optional): The window size in milliseconds. Default is 25.
+    Ss (int, optional): The step size in milliseconds. Default is 10.
+    alpha (float, optional): The preemphasis filter coefficient. Default is 0.97.
+    Returns:
+    numpy.ndarray: The preprocessed spectrogram of the audio signal.
+    """
     #ms to number of frames
     if not buckets:
         buckets={100: 2,
@@ -47,24 +91,26 @@ def preprocess(audio, buckets=None, sr=16000, Ws=25, Ss=10, alpha=0.97):
              900: 27,
              1000: 30}
     
-    Nw=round((Ws*sr)/1000)
-    Ns=round((Ss*sr)/1000)
+    # Nw and Ns in samples
+    # Nw is window size in samples
+    # Ns is step size in samples
+    Nw = round((Ws*sr)/1000)  
+    Ns = round((Ss*sr)/1000)
     
-    
-    #hamming window func signature
-    window=np.hamming
-    #get next power of 2 greater than or equal to current Nw
-    nfft=1<<(Nw-1).bit_length()
+    # hamming window func signature
+    window = np.hamming
+    # get next power of 2 greater than or equal to current Nw
+    nfft = 1<<(Nw-1).bit_length()
     
     # Remove DC and add small dither
-    audio=rm_dc_n_dither(audio)
+    audio = rm_dc_n_dither(audio)
     
     # Preemphasis filtering
-    audio=preemphasis(audio, alpha)
+    audio = preemphasis(audio, alpha)
     
     
     #get 512x300 spectrograms
-    _, _, mag=stft(audio,
+    _, _, mag = stft(audio,
     fs=sr, 
     window=window(Nw), 
     nperseg=Nw, 
@@ -74,18 +120,18 @@ def preprocess(audio, buckets=None, sr=16000, Ws=25, Ss=10, alpha=0.97):
     padded=False, 
     boundary=None)
 
-    mag=normalize_frames(np.abs(mag))
+    mag = normalize_frames(np.abs(mag))
     
-    #Get the largest bucket smaller than number of column vectors i.e. frames
-    rsize=max(i for i in buckets if i<=mag.shape[1])
-    rstart=(mag.shape[1]-rsize)//2
-    #Return truncated spectrograms
+    # Get the largest bucket smaller than number of column vectors i.e. frames
+    rsize = max(i for i in buckets if i<=mag.shape[1])
+    rstart = (mag.shape[1]-rsize)//2
+    # Return truncated spectrograms
     return mag[:,rstart:rstart+rsize]
 
 
 if __name__=="__main__":
     # Test file same as one on the authors github for testing and maintaining consistency
-    sr, audio=wavfile.read("test.wav")
+    sr, audio = wavfile.read("test.wav")
     buckets={100: 2,
      200: 5,
      300: 8,
@@ -98,6 +144,6 @@ if __name__=="__main__":
      1000: 30}
     print(audio.shape)
     # Crop and pass 3s audio for preprocessing
-    pp=preprocess(audio, buckets)
+    pp = preprocess(audio, buckets)
     print(pp.shape)
     
