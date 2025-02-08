@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 10 12:52:25 2020
-
-@author: darp_lord
-"""
-
 import torch
 import torch.nn as nn
 from collections import OrderedDict
@@ -13,6 +5,18 @@ import numpy as np
 
 
 class VGGM(nn.Module):
+    """
+    VGGM model for speaker recognition.
+    Args:
+        n_classes (int): Number of output classes. Default is 1251.
+    Methods:
+        forward(inp):
+            Defines the forward pass of the model.
+            Args:
+                inp (torch.Tensor): Input tensor of shape (batch_size, channels, height, width).
+            Returns:
+                torch.Tensor: Output tensor of shape (batch_size, n_classes).
+    """
     
     def __init__(self, n_classes=1251):
         super(VGGM, self).__init__()

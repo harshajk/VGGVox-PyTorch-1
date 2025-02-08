@@ -1,0 +1,6 @@
+scipy
+pandas
+tensorflow
+matplotlib
+tqdm
+argparse
